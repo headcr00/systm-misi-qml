@@ -6,14 +6,17 @@ class ComPort : public QSerialPort
 {
     Q_OBJECT
 public:
-   explicit ComPort();
+    explicit ComPort();
+    int connectbyPID();
 public slots:
     void readOscData();
 
+
 signals:
-    void senddata(int * arr);
+    void sendvoltagedata(int * arr);
 protected:
     void processData(QByteArray *data);
+
 };
 
 #endif // COMPORT_H

@@ -6,12 +6,22 @@
 class ResistanceItem : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString rname MEMBER rname NOTIFY rnameNotify)
+
 public:
-    explicit ResistanceItem(QObject *parent = 0);
+    explicit ResistanceItem(QString name, int res, QObject *parent = 0);
 
 signals:
+    void resistanceChanged(int res);
+    void rnameNotify();
 
-public slots:
+public slots:    
+    void clicked();
+
+private:
+    QString rname;
+    int rres;
+
 };
 
 #endif // RESISTANCEITEM_H
