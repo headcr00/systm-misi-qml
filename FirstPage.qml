@@ -7,8 +7,6 @@ import CustomPlot 1.0
 Item{
     id: firstPage
 
-
-
     CustomPlotItem {
 
         id: voltagePLot

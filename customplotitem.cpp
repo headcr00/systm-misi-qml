@@ -273,4 +273,9 @@ void CustomPlotItem::plotErrorData(QVector<double> x, QVector<double> e1, QVecto
     m_CustomPlot->xAxis->setRangeLower(x.last()-1);
 
 
+    m_CustomPlot->graph(0)->setName("1-scale factor error");
+    m_CustomPlot->graph(1)->setName("5-scale factor error");
+
+
+
 }

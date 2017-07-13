@@ -7,6 +7,7 @@ class ResistanceItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString rname MEMBER rname NOTIFY rnameNotify)
+    Q_PROPERTY(int rres MEMBER rres NOTIFY rresNotify)
 
 public:
     explicit ResistanceItem(QString name, int res, QObject *parent = 0);
@@ -14,9 +15,9 @@ public:
 signals:
     void resistanceChanged(int res);
     void rnameNotify();
+    void rresNotify();
 
-public slots:    
-    void clicked();
+
 
 private:
     QString rname;

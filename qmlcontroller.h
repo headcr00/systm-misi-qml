@@ -7,11 +7,15 @@
 #include "customplotitem.h"
 #include "resistanceitem.h"
 #include "plottermath.h"
+#include "QtCharts/QLineSeries"
+
+using namespace QtCharts;
 
 class QmlController : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool portStatus MEMBER m_portStatus NOTIFY portStatusChanged)
+    Q_PROPERTY(double errgauge MEMBER m_errgauge NOTIFY errgaugeChanged)
 
 
 public:
@@ -22,14 +26,19 @@ public:
 
 signals:
     void portStatusChanged();
+    void errgaugeChanged();
 
 
 
 public slots:
-    void toggleClicked();
+    void toggleClicked(bool status);
     void connectedClicked();
-
-    void applyClicked();
+    void selectResistance(QVariant res);
+    void applyClicked(QVariantMap a);
+    void updateSeries (QVariant a);
+    void get_errgauge(double err);
+    void get_errdistr(QList<QPointF>* pt);
+    void clearPlotsClicked();
     //void setRefvoltage(int refvoltage);
 
 
@@ -38,10 +47,12 @@ private:
     ComPort * cp;
     CustomPlotItem * voltageplot;
     CustomPlotItem * errorplot;
+    QLineSeries * errdistplot;
     bool m_portStatus = false;
+    double m_errgauge;
     QList<QObject*> * resList;
     Plottermath * pmath;
-    QSignalMapper * signalMapper;
+
 
 };
 

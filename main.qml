@@ -3,21 +3,23 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import CustomPlot 1.0
 import QtQuick.Extras 1.4
+import QtQuick.Controls.Material 2.2
 
 ApplicationWindow {
     id: window
     visible: true
-    width: 640
-    height: 480
-    color: "#ffffff"
+    width: 1024
+    height: 768
+
 
     title: qsTr("Hello World")
 
     Drawer {
         id: drawer
+        objectName: "drawer"
         width: 400
         height: window.height
-        Page1 {
+        Settings {
             anchors.fill: parent
         }
     }
@@ -26,12 +28,17 @@ ApplicationWindow {
         id: view
         currentIndex: 0
         anchors.fill: parent
+        ThirdPage{
+
+
+        }
         FirstPage {
             id: firstPage
         }
         SecondPage {
             id: secondPage
         }
+
 
     }
 
@@ -57,8 +64,9 @@ ApplicationWindow {
 
         Gauge {
             id: gauge
+
             height: 150
-            value: 1
+            value: _contr.errgauge
             minimumValue: 0
             maximumValue: 5
             tickmarkStepSize: 0.5
@@ -82,24 +90,25 @@ ApplicationWindow {
 
             model: _resModel
             header: Text{
+                color: Material.accent
                 text:qsTr("Resistance, Ohm")
                 font: label.font
 
             }
 
             delegate: RadioDelegate {
+
                 width: listView.width
                 text: model.modelData.rname
                 id: control
                 checked: index == 0
-                onClicked: model.modelData.clicked()
-
+                onClicked: _contr.selectResistance(model.modelData.rres)
                 contentItem: Text {
 
                     text: control.text
                     font: label.font
                     opacity: enabled ? 1.0 : 0.3
-                    color: control.checked ? "#ccffff" : "#0044cc"
+                    color: Material.accent //"#ccffff" : "#0044cc"
 
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
@@ -112,7 +121,7 @@ ApplicationWindow {
                     implicitWidth: parent.width
                     implicitHeight: 10
 
-                    color:control.checked ? "#3f51b5" : "#f4f5fb"
+                    color:control.checked ? Material.primary : Material.background//"#3f51b5" : "#f4f5fb"
 
                 }
 
@@ -155,11 +164,19 @@ ApplicationWindow {
                 }
             }
             ToolButton{
+                id: toggleBtn
                 text: qsTr("Toggle")
                 objectName: "toggleBtn"
-                onCheckedChanged: _contr.toggleClicked()
+                onCheckedChanged: _contr.toggleClicked(toggleBtn.checked)
                 checkable: true
 
+            }
+
+            ToolButton
+            {
+                id: clrPlots
+                text: qsTr("Clear plots")
+                onClicked: _contr.clearPlotsClicked()
             }
         }
 

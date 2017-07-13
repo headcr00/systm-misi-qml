@@ -11,6 +11,7 @@ class CustomPlotItem : public QQuickPaintedItem
     Q_PROPERTY(QString yTitle READ getYTitle WRITE setYTitle NOTIFY yTitleChanged)
     Q_PROPERTY(double ymin READ getymin WRITE setymin NOTIFY yminChanged)
     Q_PROPERTY(double ymax READ getymax WRITE setymax NOTIFY ymaxChanged)
+
 public:
     CustomPlotItem( QQuickItem* parent = 0 );
     virtual ~CustomPlotItem();

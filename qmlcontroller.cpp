@@ -1,9 +1,16 @@
 #include "qmlcontroller.h"
 #include "comport.h"
 #include "customplotitem.h"
+#include <QVariant>
+#include <QVariantMap>
+#include <QtCharts>
 #include <qobject.h>
 #include "resistanceitem.h"
 #include "plottermath.h"
+#include "misiparams_typedef.h"
+
+using namespace QtCharts;
+MisiParams misiparams;
 
 QmlController::QmlController(QQmlApplicationEngine * engine, QObject *parent) : QObject(parent)
   , appengine(engine), resList(new QList<QObject*>)
@@ -42,24 +49,7 @@ QmlController::QmlController(QQmlApplicationEngine * engine, QObject *parent) : 
     resList->append(new ResistanceItem("8M", 8000000));
     resList->append(new ResistanceItem("9M", 9000000));
     resList->append(new ResistanceItem("10M", 10000000));
-
-    signalMapper = new QSignalMapper(this);
-
-
-    QMutableListIterator<QObject*> i(*resList);
-
-    while(i.hasNext())
-    {
-        QObject::connect(i.next(), SIGNAL(resistanceChanged(int)), pmath, SLOT(getResistance(int)));
-
-    }
-
-
-
     appengine->rootContext()->setContextProperty("_resModel", QVariant::fromValue(*resList));
-
-
-
     QObject::connect(cp, SIGNAL(readyRead()), cp, SLOT(readOscData()));
 
 }
@@ -78,10 +68,14 @@ void QmlController::setObjects()
 {
 
     connect (cp, SIGNAL(sendvoltagedata(int*)), pmath, SLOT(getVoltData(int*)));   //connect com port with math slot.
+    connect(pmath, SIGNAL(sendmedianerr(double)), this, SLOT(get_errgauge(double))); //Connect math to error gauge
+    connect(pmath, SIGNAL(senderrdistr(QList<QPointF>*)), this, SLOT(get_errdistr(QList<QPointF>*)));//Connect math to third graph
 
     QQuickWindow *window = qobject_cast<QQuickWindow *>(appengine->rootObjects().first());
+
     voltageplot = window->findChild<CustomPlotItem *>("voltagePlot");
     errorplot = window->findChild<CustomPlotItem *>("errorPlot");
+
 
     //Check if we have right object
     if (QString::compare(voltageplot->objectName(), "voltagePlot") == 0){
@@ -97,37 +91,80 @@ void QmlController::setObjects()
     //Check if we have right object
     if (QString::compare(errorplot->objectName(), "errorPlot") == 0){
         qDebug() << "Found error plot";
-        //QObject::connect(cp,SIGNAL(senddata(int*)),plot,SLOT(updatedata(int*)));
         errorplot->createPlots(2);
         connect(pmath, SIGNAL(senderrordata(QVector<double>,QVector<double>,QVector<double>)),errorplot,SLOT(plotErrorData(QVector<double>,QVector<double>,QVector<double>)));
     }
     else
         qDebug() << "Somehow err";
+
+
 }
 
-void QmlController::toggleClicked()
+void QmlController::toggleClicked(bool status)
 {
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(appengine->rootObjects().first());
-    QObject *btn = window->findChild<QObject *>("toggleBtn");
-    if (QString::compare(btn->objectName(), "toggleBtn") == 0){
-        qDebug()<< btn->property("checked").toBool();
-        if (btn->property("checked").toBool() == true)
+    qDebug() << status;
+
+        if (status == true)
         {
-            disconnect(cp,SIGNAL(sendvoltagedata(int*)),voltageplot,SLOT(updatedata(int*)));
+            disconnect(cp,SIGNAL(sendvoltagedata(int*)),pmath,SLOT(getVoltData(int*)));
         }
         else
         {
-            QObject::connect(cp,SIGNAL(sendvoltagedata(int*)),voltageplot,SLOT(updatedata(int*)));
+            connect(cp,SIGNAL(sendvoltagedata(int*)),pmath,SLOT(getVoltData(int*)));
         }
 
-    }
-
 }
 
-void QmlController::applyClicked()
+void QmlController::applyClicked(QVariantMap a)
 {
 
+    qDebug()<< "apply";
 
+    misiparams.refvolt = a.value("refvolt").toDouble();
+    misiparams.supvolt = a.value("supvolt").toDouble();
+    misiparams.shuntres = a.value("shuntres").toDouble()*1000;
+    misiparams.protres = a.value("protres").toDouble()*1000;
+    misiparams.lineres = a.value("lineres").toDouble()*1000;
+    misiparams.submres = a.value("submres").toDouble()*1000;
+    misiparams.cblockres = a.value("cblockres").toDouble()*1000;
+    misiparams.mcuVolt = a.value("mcuVolt").toDouble();
+    misiparams.useMcuVolt = a.value("useMcuVolt").toBool();
+    qDebug()<< misiparams.lineres;
+    pmath->getRefData(misiparams);
 }
 
+
+void QmlController::selectResistance(QVariant res)
+{
+    pmath->pm_cleardata();
+    pmath->getResistance(res.toInt());
+}
+
+
+void QmlController::updateSeries(QVariant a)
+{
+
+    QAbstractSeries* series;
+    QObject * obj = qvariant_cast<QObject*>(a);
+    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 0));
+
+    errdistplot = qobject_cast<QLineSeries*> (series);
+}
+
+void QmlController::get_errgauge(double err)
+{
+
+    m_errgauge = err;
+    emit errgaugeChanged();
+}
+
+void QmlController::get_errdistr(QList<QPointF> *pt)
+{
+    errdistplot->replace(*pt);
+}
+
+void QmlController::clearPlotsClicked()
+{
+pmath->pm_cleardata();
+}
 

@@ -1,4 +1,4 @@
-QT += qml quick widgets printsupport serialport
+QT += qml quick widgets printsupport serialport charts
 
 CONFIG += c++11
 
@@ -40,4 +40,5 @@ HEADERS += \
     comport.h \
     qmlcontroller.h \
     resistanceitem.h \
-    plottermath.h
+    plottermath.h \
+    misiparams_typedef.h
