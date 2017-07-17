@@ -67,7 +67,11 @@ void QmlController::connectedClicked()
 void QmlController::setObjects()
 {
 
-    connect (cp, SIGNAL(sendvoltagedata(int*)), pmath, SLOT(getVoltData(int*)));   //connect com port with math slot.
+    QTimer * timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), pmath, SLOT(processSerialData()));
+    timer->start(100);
+
+    connect (cp, SIGNAL(sendvoltagedata(int*)), pmath, SLOT(getSerialData(int*)));   //connect com port with math slot.
     connect(pmath, SIGNAL(sendmedianerr(double)), this, SLOT(get_errgauge(double))); //Connect math to error gauge
     connect(pmath, SIGNAL(senderrdistr(QList<QPointF>*)), this, SLOT(get_errdistr(QList<QPointF>*)));//Connect math to third graph
 
@@ -81,7 +85,7 @@ void QmlController::setObjects()
     if (QString::compare(voltageplot->objectName(), "voltagePlot") == 0){
         qDebug() << "Found voltage plot";
         voltageplot->createPlots(3);
-        connect(cp,SIGNAL(sendvoltagedata(int*)),pmath,SLOT(getVoltData(int*)));
+        connect (cp, SIGNAL(sendvoltagedata(int*)), pmath, SLOT(getSerialData(int*)));
         connect(pmath, SIGNAL(sendvoltagedata(QVector<double>,QVector<double>,QVector<double>,QVector<double>)),voltageplot,SLOT(plotVoltageData(QVector<double>,QVector<double>,QVector<double>,QVector<double>)));
 
     }

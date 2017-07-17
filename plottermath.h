@@ -11,6 +11,7 @@ public:
     explicit Plottermath(QObject *parent = 0);
     void pm_cleardata();
 
+
 signals:
     void sendvoltagedata(QVector<double>, QVector<double>, QVector<double>, QVector<double>);
     void senderrordata(QVector<double>, QVector<double>,QVector<double>);
@@ -20,11 +21,13 @@ signals:
 
 public slots:
     void getRefData(MisiParams mp);
-    void getVoltData(int * arr);
     void getResistance(int res);
+    void getSerialData(int * arr);
+    void processSerialData();
 
 private:
     int resistance = 10000;
+    char counter = 0;
     MisiParams mparams;
     QVector<double> * adc0;
     QVector<double> * adc1;
@@ -36,6 +39,7 @@ private:
 
     int searchpoint_x(int x);
     void norm_points(QList<QPointF> *plist);
+
 
 
 };
