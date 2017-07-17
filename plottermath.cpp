@@ -119,7 +119,7 @@ void Plottermath::getVoltData(int *arr)
     }
 
     qSort(errpoints->begin(), errpoints->end(), variantLessThan);
-
+    norm_points(errpoints);
     //qDebug() << errgauge << measres1 << measres2;
     emit sendmedianerr(errgauge);
     emit senderrdistr(errpoints);
@@ -145,8 +145,26 @@ int Plottermath::searchpoint_x(int x)
 
 }
 
+void Plottermath::norm_points(QList<QPointF> *plist)
+{
+    double maxval = 0;
+
+    foreach (QPointF pt, *plist) {
+        if (pt.y() > maxval)
+            maxval = static_cast<double>(pt.y());
+
+    }
+
+    for (int i = 0; i < plist->size(); i++)
+    {
+        (*plist)[i].setY((*plist)[i].y()/maxval);
+    }
+
+}
+
 // Compare two variants.
 bool variantLessThan(const QPointF &v1, const QPointF &v2)
 {
     return v1.x() < v2.x();
 }
+

@@ -117,9 +117,6 @@ void QmlController::toggleClicked(bool status)
 
 void QmlController::applyClicked(QVariantMap a)
 {
-
-    qDebug()<< "apply";
-
     misiparams.refvolt = a.value("refvolt").toDouble();
     misiparams.supvolt = a.value("supvolt").toDouble();
     misiparams.shuntres = a.value("shuntres").toDouble()*1000;
@@ -129,7 +126,6 @@ void QmlController::applyClicked(QVariantMap a)
     misiparams.cblockres = a.value("cblockres").toDouble()*1000;
     misiparams.mcuVolt = a.value("mcuVolt").toDouble();
     misiparams.useMcuVolt = a.value("useMcuVolt").toBool();
-    qDebug()<< misiparams.lineres;
     pmath->getRefData(misiparams);
 }
 

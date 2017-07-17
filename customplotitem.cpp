@@ -131,7 +131,7 @@ QString CustomPlotItem::getYTitle()
 
 void CustomPlotItem::plotSetup()
 {
-    m_CustomPlot->setOpenGl(true);
+    //m_CustomPlot->setOpenGl(true);
     m_CustomPlot ->setInteractions( QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables );
 /*
     m_CustomPlot -> addGraph();
@@ -223,7 +223,7 @@ void CustomPlotItem::createPlots(int amount)
     for (int i = 0; i < amount; i++)
     {
         m_CustomPlot->addGraph();
-        m_CustomPlot->graph(i)->setLineStyle(QCPGraph::lsStepCenter);
+        //m_CustomPlot->graph(i)->setLineStyle(QCPGraph::lsStepCenter);
 
 
     }

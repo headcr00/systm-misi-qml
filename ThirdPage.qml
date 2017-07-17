@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import QtCharts 2.0
 Item {
-
+    id: errc
 
     ChartView {
         id: errDisChart
@@ -21,25 +21,29 @@ Item {
 
         ValueAxis{
             id: valueAxisX
+            titleText: "Error, %"
             //base: 10
             min: 0
-            max: 15
-            minorTickCount: 15
+            max: 20
+            minorTickCount: 5
         }
         ValueAxis{
+            titleText: "Amplitude"
             id:valueAxisY
+            minorTickCount: 5
             min: 0
-            max: 700
+            max: 1
         }
 
         LineSeries {
             id: seriesl
                 visible: true
-               name: "LineSeries"
+               name: "Error"
                axisX: valueAxisX
                axisY: valueAxisY
            }
         LineSeries{
+            name: "5%"
             color: "red"
             XYPoint{
                 x:5
@@ -48,11 +52,12 @@ Item {
 
             XYPoint{
                 x:5
-                y:700
+                y:1
             }
         }
 
         LineSeries{
+            name: "2%"
             color: "red"
             style: Qt.DashLine
             XYPoint{
@@ -62,7 +67,7 @@ Item {
 
             XYPoint{
                 x:2
-                y:700
+                y:1
             }
         }
 

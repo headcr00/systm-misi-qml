@@ -19,7 +19,9 @@ Item {
             mcuVolt: mcuVoltage.text,
             useMcuVolt: chbox_vref.checked
 
+
         }
+        console.log(chbox_vref.checked)
         _contr.applyClicked(rval)
     }
 
@@ -33,31 +35,8 @@ Item {
         anchors.top: parent.top
         anchors.topMargin: 20
 
-        Button {
-            id: b_Connect
-            text: qsTr("      Connect")
 
-            Layout.fillWidth: true
-            transformOrigin: Item.Center
-            onClicked: _contr.connectedClicked()
 
-            StatusIndicator
-            {
-                anchors.verticalCenter:  parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 5
-                active: _contr.portStatus
-                color: "green"
-            }
-        }
-
-        Button {
-            id: b_Apply
-            text: qsTr("Apply")
-            Layout.fillWidth: true
-            transformOrigin: Item.Center
-            onClicked: sendFormData()//_contr.applyClicked()
-        }
 
 
         Label{
@@ -67,7 +46,7 @@ Item {
         TextField {
             id: refVoltText
             objectName: "refVoltText"
-            anchors.left: adcRefText.left
+
 
             validator: DoubleValidator{}
             maximumLength: 8
@@ -144,13 +123,23 @@ Item {
         {
             id: chbox_vref
             text: qsTr("Use supply as ref, mV:")
+            onClicked: sendFormData()
         }
         TextField{
             id: mcuVoltage
             validator: DoubleValidator{}
             enabled: chbox_vref.checked ? true : false
+
             text: "3312"
         }
+        Button {
+            id: b_Apply
+            text: qsTr("Apply")
+            Layout.fillWidth: true
+            transformOrigin: Item.Center
+            onClicked: sendFormData()//_contr.applyClicked()
+        }
+
 
 
 

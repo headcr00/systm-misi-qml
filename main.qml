@@ -1,10 +1,10 @@
 import QtQuick 2.7
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.0
 import CustomPlot 1.0
 import QtQuick.Extras 1.4
 import QtQuick.Controls.Material 2.2
-
+import QtQuick.Dialogs 1.2
 ApplicationWindow {
     id: window
     visible: true
@@ -29,7 +29,7 @@ ApplicationWindow {
         currentIndex: 0
         anchors.fill: parent
         ThirdPage{
-
+            id: thirdpage
 
         }
         FirstPage {
@@ -141,12 +141,15 @@ ApplicationWindow {
     }
 
     header:ToolBar{
-
+spacing: 10
         RowLayout{
             anchors.fill:  parent
+
+
             ToolButton{
                 id: openSettings
                 onClicked: drawer.open()
+
 
                 ColumnLayout{
                     anchors.verticalCenter: parent.verticalCenter
@@ -163,12 +166,34 @@ ApplicationWindow {
                     }
                 }
             }
+
+
+            ToolButton{
+                id: b_Connect
+                text: qsTr("        Connect")
+
+//                Layout.fillWidth: true
+                transformOrigin: Item.Center
+                onClicked: _contr.connectedClicked()
+
+                StatusIndicator
+                {
+                    anchors.verticalCenter:  parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: 5
+                    active: _contr.portStatus
+                    color: "green"
+                }
+            }
+
             ToolButton{
                 id: toggleBtn
                 text: qsTr("Toggle")
                 objectName: "toggleBtn"
                 onCheckedChanged: _contr.toggleClicked(toggleBtn.checked)
                 checkable: true
+
+
 
             }
 
@@ -178,6 +203,36 @@ ApplicationWindow {
                 text: qsTr("Clear plots")
                 onClicked: _contr.clearPlotsClicked()
             }
+
+            ToolButton{
+                id: saveaspngbtn
+                text: "Save as PNG"
+                onClicked: fileDialog.open()
+
+
+                FileDialog {
+                    id: fileDialog
+                    title: "Please choose a file"
+                    nameFilters: [ "Image files (*.png)", "All files (*)" ]
+                    folder: shortcuts.home
+                    selectExisting: false
+                    onAccepted: {
+                        var urlNoProtocol = (fileDialog.fileUrls+"").replace('file:///', '');
+                        view.grabToImage(function(result){
+                            if (!result.saveToFile(urlNoProtocol)){
+                                console.error("Error:", urlNoProtocol);
+                            }
+                        })
+                    }
+                    onRejected: {
+                        console.log("Canceled")
+                        console.log()
+                    }
+
+                }
+            }
+
+
         }
 
 

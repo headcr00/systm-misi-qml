@@ -35,6 +35,7 @@ private:
     QList<QPointF> * errpoints;
 
     int searchpoint_x(int x);
+    void norm_points(QList<QPointF> *plist);
 
 
 };
