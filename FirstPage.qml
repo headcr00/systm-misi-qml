@@ -1,15 +1,14 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
-import CustomPlot 1.0
 import QtQuick.Extras 1.4
-import CustomPlot 1.0
+import QtCharts 2.0
 Item{
     id: firstPage
 
-    CustomPlotItem {
+    ChartView {
 
-        id: voltagePLot
+        id: voltagePlot
         objectName: "voltagePlot"
         anchors.topMargin: 0
         anchors.right: parent.right
@@ -17,23 +16,78 @@ Item{
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.rightMargin: 120
-        yTitle : "Voltage, mV"
-        ymin: 0
-        ymax: 3.5
-        Component.onCompleted: initCustomPlot()
+        Component.onCompleted: _contr.initVoltagePlot(voltagePlot)
+
+        legend.alignment: Qt.AlignBottom
+        title: "Voltage plot"
+        //animationOptions: ChartView.AllAnimations
 
 
+
+
+
+        ValueAxis{
+            id: valueAxisX
+            titleText: "Data frame"
+            min:0
+            max:1024
+
+
+        }
+        ValueAxis{
+            titleText: "Voltage, V"
+            id:valueAxisY
+
+            tickCount: 8
+            min: 0
+            max: 3.5
+        }
+
+        LineSeries{
+            useOpenGL: true
+            id: adc0s
+            axisX: valueAxisX
+            axisY: valueAxisY
+            name: "ADC0: 1x scale"
+
+
+            onPointsReplaced: {
+
+             voltagePlot.scrollRight(Math.round(adc0s.at(adc0s.count-1).x - valueAxisX.max)* (voltagePlot.plotArea.width/1024));
+
+            }
+        }
+
+
+        LineSeries{
+            useOpenGL: true
+            id: adc1s
+            axisX: valueAxisX
+            axisY: valueAxisY
+            name: "ADC1: 10x scale"
+        }
+
+
+        LineSeries{
+            useOpenGL: true
+            id: adc2s
+            axisX: valueAxisX
+            axisY: valueAxisY
+            name: "ADC2: Reference voltage"
+        }
 
     }
+
+
     Label {
 
         text: qsTr("Voltage graph")
         font.pointSize: 45
 
-        anchors.verticalCenter: voltagePLot.verticalCenter
+        anchors.verticalCenter: voltagePlot.verticalCenter
 
 
-        anchors.horizontalCenter: voltagePLot.horizontalCenter
+        anchors.horizontalCenter: voltagePlot.horizontalCenter
         anchors.horizontalCenterOffset: 30
         opacity: 0.1
     }

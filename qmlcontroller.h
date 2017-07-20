@@ -24,6 +24,7 @@ public:
     void setObjects();
 
 
+
 signals:
     void portStatusChanged();
     void errgaugeChanged();
@@ -31,15 +32,26 @@ signals:
 
 
 public slots:
+
+    //GUI manipulation
+
+    void clearPlotsClicked();
     void toggleClicked(bool status);
     void connectedClicked();
     void selectResistance(QVariant res);
     void applyClicked(QVariantMap a);
-    void updateSeries (QVariant a);
     void get_errgauge(double err);
-    void get_errdistr(QList<QPointF>* pt);
-    void clearPlotsClicked();
-    //void setRefvoltage(int refvoltage);
+    //Plot manipulation
+    void initVoltagePlot(QVariant plobj);
+    void initErrorPlot(QVariant plobj);
+    void initDistrPlot (QVariant plobj);
+
+    void getVoltagePlotData(QList<QPointF>* pt0, QList<QPointF>* pt1, QList<QPointF>* pt2);
+    void getErrorPlotData(QList<QPointF>* pt0, QList<QPointF>* pt1);
+    void getDistrPlotData(QList<QPointF>* pt0);
+
+
+
 
 
 private:
@@ -47,7 +59,14 @@ private:
     ComPort * cp;
     CustomPlotItem * voltageplot;
     CustomPlotItem * errorplot;
+    //Graph series
     QLineSeries * errdistplot;
+    QLineSeries * adc0series;
+    QLineSeries * adc1series;
+    QLineSeries * adc2series;
+    QLineSeries * err1series;
+    QLineSeries * err5series;
+
     bool m_portStatus = false;
     double m_errgauge;
     QList<QObject*> * resList;

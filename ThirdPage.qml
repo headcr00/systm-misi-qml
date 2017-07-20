@@ -13,11 +13,9 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.rightMargin: 120
-
-
-
         legend.alignment: Qt.AlignBottom
         antialiasing: true
+animationOptions: ChartView.AllAnimations
 
         ValueAxis{
             id: valueAxisX
@@ -41,8 +39,11 @@ Item {
                name: "Error"
                axisX: valueAxisX
                axisY: valueAxisY
+               useOpenGL: true
+
            }
         LineSeries{
+            useOpenGL: true
             name: "5%"
             color: "red"
             XYPoint{
@@ -57,6 +58,7 @@ Item {
         }
 
         LineSeries{
+            useOpenGL: true
             name: "2%"
             color: "red"
             style: Qt.DashLine
@@ -75,7 +77,7 @@ Item {
 
 
     Component.onCompleted: {
-        _contr.updateSeries(errDisChart)
+        _contr.initDistrPlot(errDisChart)
 
     }
 }

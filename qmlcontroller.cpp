@@ -73,13 +73,12 @@ void QmlController::setObjects()
 
     connect (cp, SIGNAL(sendvoltagedata(int*)), pmath, SLOT(getSerialData(int*)));   //connect com port with math slot.
     connect(pmath, SIGNAL(sendmedianerr(double)), this, SLOT(get_errgauge(double))); //Connect math to error gauge
-    connect(pmath, SIGNAL(senderrdistr(QList<QPointF>*)), this, SLOT(get_errdistr(QList<QPointF>*)));//Connect math to third graph
+    connect(pmath, SIGNAL(senderrdistr(QList<QPointF>*)), this, SLOT(getDistrPlotData(QList<QPointF>*)));//Connect math to third graph
+    connect(pmath, SIGNAL(senderrordata(QList<QPointF>*,QList<QPointF>*)), this, SLOT(getErrorPlotData(QList<QPointF>*,QList<QPointF>*)));//Connect math to sec graph
+    connect(pmath, SIGNAL(sendvoltagedata(QList<QPointF>*,QList<QPointF>*,QList<QPointF>*)), this, SLOT(getVoltagePlotData(QList<QPointF>*,QList<QPointF>*,QList<QPointF>*)));//Connect math to sec graph
 
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(appengine->rootObjects().first());
 
-    voltageplot = window->findChild<CustomPlotItem *>("voltagePlot");
-    errorplot = window->findChild<CustomPlotItem *>("errorPlot");
-
+/*
 
     //Check if we have right object
     if (QString::compare(voltageplot->objectName(), "voltagePlot") == 0){
@@ -99,14 +98,48 @@ void QmlController::setObjects()
         connect(pmath, SIGNAL(senderrordata(QVector<double>,QVector<double>,QVector<double>)),errorplot,SLOT(plotErrorData(QVector<double>,QVector<double>,QVector<double>)));
     }
     else
-        qDebug() << "Somehow err";
+        qDebug() << "Somehow err";*/
 
 
 }
+/*!
+ * \brief QmlController::initVoltagePlot
+ * Initializes ADCx series for voltage plot. Called from FirstPage.qml
+ * \param plobj chartview object
+ */
+void QmlController::initVoltagePlot(QVariant plobj)
+{
+    QAbstractSeries* series;
+    QObject * obj = qvariant_cast<QObject*>(plobj);
+    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 0));
+    adc0series = qobject_cast<QLineSeries*> (series);
+    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 1));
+    adc1series = qobject_cast<QLineSeries*> (series);
+    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 2));
+    adc2series = qobject_cast<QLineSeries*> (series);
+
+
+}
+/*!
+ * \brief QmlController::initErrorPlot
+ * Initializes ERRx series for error plot. Called from SeconPage.qml
+ * \param plobj chartview object
+ */
+void QmlController::initErrorPlot(QVariant plobj)
+{
+    QAbstractSeries* series;
+    QObject * obj = qvariant_cast<QObject*>(plobj);
+    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 0));
+    err1series = qobject_cast<QLineSeries*> (series);
+    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 1));
+    err5series = qobject_cast<QLineSeries*> (series);
+}
+
+
 
 void QmlController::toggleClicked(bool status)
 {
-    qDebug() << status;
+  /*  qDebug() << status;
 
         if (status == true)
         {
@@ -115,7 +148,7 @@ void QmlController::toggleClicked(bool status)
         else
         {
             connect(cp,SIGNAL(sendvoltagedata(int*)),pmath,SLOT(getVoltData(int*)));
-        }
+        }*/
 
 }
 
@@ -141,26 +174,63 @@ void QmlController::selectResistance(QVariant res)
 }
 
 
-void QmlController::updateSeries(QVariant a)
+void QmlController::initDistrPlot(QVariant plobj)
 {
 
     QAbstractSeries* series;
-    QObject * obj = qvariant_cast<QObject*>(a);
-    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 0));
-
+    QObject * obj = qvariant_cast<QObject*>(plobj);
+    QMetaObject::invokeMethod(obj, "series", Qt::AutoConnection, Q_RETURN_ARG(QAbstractSeries*, series), Q_ARG(int, 0));    
     errdistplot = qobject_cast<QLineSeries*> (series);
 }
+/*!
+ * \brief QmlController::getVoltagePlotData
+ * Updates voltage data. This slot is connected to pmath
+ * \param pt0   adc0 series
+ * \param pt1   adc1 series
+ * \param pt2   vref series
+ */
+void QmlController::getVoltagePlotData(QList<QPointF> *pt0, QList<QPointF> *pt1, QList<QPointF> *pt2)
+{
+    adc0series->replace(*pt0);
+    adc1series->replace(*pt1);
+    adc2series->replace(*pt2);
 
+}
+/*!
+ * \brief QmlController::getErrorPlotData
+ * Updates error data. This slot is connected to pmath
+ * \param pt0   err1 series
+ * \param pt1   err5 series
+ */
+void QmlController::getErrorPlotData(QList<QPointF> *pt0, QList<QPointF> *pt1)
+{
+    err1series->replace(*pt0);
+    err5series->replace(*pt1);
+
+
+}
+/*!
+ * \brief QmlController::get_errgauge
+ * Updates value in error gauge in main.qml. Connected to pmath
+ * \param err
+ */
 void QmlController::get_errgauge(double err)
 {
-
+    qDebug()<<err;
     m_errgauge = err;
     emit errgaugeChanged();
 }
 
-void QmlController::get_errdistr(QList<QPointF> *pt)
+/*!
+ * \brief QmlController::getDistrPlotData
+ * Updates error distribution series in firstpage.qml. Connected to pmath.
+ * \param pt0
+ */
+void QmlController::getDistrPlotData(QList<QPointF> *pt0)
 {
-    errdistplot->replace(*pt);
+    errdistplot->replace(*pt0);
+
+
 }
 
 void QmlController::clearPlotsClicked()

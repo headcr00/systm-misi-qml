@@ -13,8 +13,12 @@ public:
 
 
 signals:
+    /* legacy
     void sendvoltagedata(QVector<double>, QVector<double>, QVector<double>, QVector<double>);
     void senderrordata(QVector<double>, QVector<double>,QVector<double>);
+    */
+    void sendvoltagedata(QList<QPointF>*, QList<QPointF>*, QList<QPointF>*);
+    void senderrordata(QList<QPointF>*, QList<QPointF>*);
     void senderrdistr(QList<QPointF>*);
     void sendmedianerr(double);
 
@@ -29,13 +33,20 @@ private:
     int resistance = 10000;
     char counter = 0;
     MisiParams mparams;
+    /*Legacy
     QVector<double> * adc0;
     QVector<double> * adc1;
     QVector<double> * adc2;
     QVector<double> * err1;
     QVector<double> * err5;
     QVector<double> * x;
+    */
     QList<QPointF> * errpoints;
+    QList<QPointF> * adc0points;
+    QList<QPointF> * adc1points;
+    QList<QPointF> * adc2points;
+    QList<QPointF> * err1points;
+    QList<QPointF> * err5points;
 
     int searchpoint_x(int x);
     void norm_points(QList<QPointF> *plist);
